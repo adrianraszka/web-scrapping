@@ -3,3 +3,6 @@ mgstrk
 testa2.py
 Pipfile
 Pipfile.lock
+chromedriver.exe
+requirements.txt
+testy.py

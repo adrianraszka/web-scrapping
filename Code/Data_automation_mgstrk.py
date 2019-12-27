@@ -28,10 +28,12 @@ class Home_seeker:
     def source_of_homepage(self, city):
         """ Returns source code of page """
 
+        page = 1
         self.city = city
-        self.driver.get('https://www.otodom.pl/wynajem/mieszkanie/{}/'.format(city))
+        self.driver.get('https://www.otodom.pl/wynajem/mieszkanie/{}/?page={}'.format(city, page))
         self.page_source = self.driver.page_source
         self.soup = BeautifulSoup(self.page_source, 'lxml')
+        page += 1
         return self.soup
 
     def number_of_pages(self):
@@ -44,22 +46,35 @@ class Home_seeker:
             temporary_list.append(li.text)
         return temporary_list[int(len(temporary_list) - 2)]
 
-    def get_links_from_page(self):
-        """ Getting links for unique offers. """
-        
-        print(Home.number_of_pages())
-            
+    def list_of_links(self, city):
+        """ Prepare list of links to gether all unique offers """
 
-        # print(self.soup.prettify())
-        # self.main_div = self.soup.find('div', class_="col-md-content section-listing__row-content")
-        # for self.h3 in self.main_div.fina_all('h3'):
-        #     self.links = h3.fina_all('a')
-        #     for self.a in self.links:
-        #         print(self.a.text)
+        self.pages_of_city = int(Home.number_of_pages())
+        list_of_city_links = []
+        for i in range(1, self.pages_of_city + 1):
+            list_of_city_links.append('https://www.otodom.pl/wynajem/mieszkanie/{}/?page={}'.format(self.city, i))
         
+        print(list_of_city_links)
+        return list_of_city_links
+
+    def get_links_from_page(self):
+        ''' Take a link and retrieve all links of offers '''
+        pass
+
+    def get_data_from_link(self):
+        ''' Take a link of offer and retrieve data from that offer '''
+        pass
+
+    def save_data_info_file(self):
+        ''' Take retrieved data and put into some datafile '''
+        pass
+
+
+list_of_cities = ['krakow']
 
 if __name__ == "__main__":
     Home = Home_seeker()
-    Home.source_of_homepage('krakow')
-    Home.number_of_pages()
-    Home.get_links_from_page()
+    for city in list_of_cities:
+        Home.source_of_homepage(city)
+        Home.number_of_pages()
+        Home.list_of_links(city)

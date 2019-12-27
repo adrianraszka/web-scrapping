@@ -19,31 +19,36 @@ class Home_seeker:
         """
 
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument("--window-size={}".format(WINDOW_SIZE))
         chrome_options.binary_location = CHROME_PATH
         self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                                 options=chrome_options)
         
-
-    def run_thourgh_pages(self, city):
-        """
-        Getting all page links form certain city.
-        Given 24 records on the page, run through all pages to access every record.
-        """
+    def source_of_homepage(self, city):
+        """ Returns source code of page """
 
         self.city = city
         self.driver.get('https://www.otodom.pl/wynajem/mieszkanie/{}/'.format(city))
-        html_city = self.driver.page_source
-        return html_city
+        self.page_source = self.driver.page_source
+        self.soup = BeautifulSoup(self.page_source, 'lxml')
+        return self.soup
+
+    def number_of_pages(self):
+        """ Given city name, returns number of pages with unique offers. """
+
+        self.soup = Home.source_of_homepage(self.city)
+        self.pager = self.soup.find('ul', class_="pager")
+        temporary_list = []
+        for li in self.pager.find_all('li'):
+            temporary_list.append(li.text)
+        return temporary_list[int(len(temporary_list) - 2)]
 
     def get_links_from_page(self):
         """ Getting links for unique offers. """
         
-        self.soup = BeautifulSoup(krakow.run_thourgh_pages(self.city), 'lxml')
-        
-        for h3 in self.soup.find_all('h3'):
-            print(h3.text)
+        print(Home.number_of_pages())
+            
 
         # print(self.soup.prettify())
         # self.main_div = self.soup.find('div', class_="col-md-content section-listing__row-content")
@@ -53,11 +58,8 @@ class Home_seeker:
         #         print(self.a.text)
         
 
-
-
-
-
 if __name__ == "__main__":
-    krakow = Home_seeker()
-    krakow.run_thourgh_pages('krakow')
-    krakow.get_links_from_page()
+    Home = Home_seeker()
+    Home.source_of_homepage('krakow')
+    Home.number_of_pages()
+    Home.get_links_from_page()

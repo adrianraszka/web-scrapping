@@ -33,7 +33,7 @@ class Home_seeker:
         self.driver.get('https://www.otodom.pl/wynajem/mieszkanie/{}/?page={}'.format(city, page))
         self.page_source = self.driver.page_source
         self.soup = BeautifulSoup(self.page_source, 'lxml')
-        page += 1
+        page+=1
         return self.soup
 
     def number_of_pages(self):
@@ -41,25 +41,35 @@ class Home_seeker:
 
         self.soup = Home.source_of_homepage(self.city)
         self.pager = self.soup.find('ul', class_="pager")
-        temporary_list = []
+        temporary_list_of_pages = []
         for li in self.pager.find_all('li'):
-            temporary_list.append(li.text)
-        return temporary_list[int(len(temporary_list) - 2)]
+            temporary_list_of_pages.append(li.text)
+        return temporary_list_of_pages[int(len(temporary_list_of_pages) - 2)]
 
     def list_of_links(self, city):
         """ Prepare list of links to gether all unique offers """
 
         self.pages_of_city = int(Home.number_of_pages())
-        list_of_city_links = []
+        list_of_page_links = []
         for i in range(1, self.pages_of_city + 1):
-            list_of_city_links.append('https://www.otodom.pl/wynajem/mieszkanie/{}/?page={}'.format(self.city, i))
-        
-        print(list_of_city_links)
-        return list_of_city_links
+            list_of_page_links.append('https://www.otodom.pl/wynajem/mieszkanie/{}/?page={}'.format(self.city, i))
+        # print(list_of_page_links)
+        return list_of_page_links[:5]
 
     def get_links_from_page(self):
         ''' Take a link and retrieve all links of offers '''
-        pass
+        
+        #Maybe multithreading would fit
+
+        temporary_list_of_offers = []
+        for page_link in Home.list_of_links(self.city):
+            self.soup = Home.source_of_homepage(self.city)
+            self.main_div = self.soup.find('div', attrs={"class": "col-md-content section-listing__row-content"})
+            for article in self.main_div.find_all('article'):
+                temporary_list_of_offers.append(article['data-url'])
+        print(temporary_list_of_offers)
+        return temporary_list_of_offers
+
 
     def get_data_from_link(self):
         ''' Take a link of offer and retrieve data from that offer '''
@@ -78,3 +88,4 @@ if __name__ == "__main__":
         Home.source_of_homepage(city)
         Home.number_of_pages()
         Home.list_of_links(city)
+        Home.get_links_from_page()

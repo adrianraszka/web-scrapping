@@ -3,7 +3,8 @@ from selenium import webdriver
 import time
 from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
-
+import testa2
+import csv
 
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 CHROMEDRIVER_PATH = 'C:/Users/Adrian.Raszka/OneDrive - SOFYNE ACTIVE TECHNOLOGY/Bureau/gitvsc/chromedriver.exe'
@@ -72,7 +73,18 @@ class Home_seeker:
 
     def get_data_from_link(self):
         ''' Take a link of offer and retrieve data from that offer '''
-        pass
+        
+        # self.links_of_offers = Home.get_links_from_page()
+        # print(self.links_of_offers)
+        headers = ['price per month']
+        self.test_set = testa2.test_set
+        with open('text.csv', 'w', encoding='utf-8', newline='') as fp:
+            self.writer = csv.writer(fp)
+            self.writer.writerow(headers)
+            for link in self.test_set:
+                self.driver.get(link)
+                price_per_month = self.driver.find_element_by_xpath('//*[@id="root"]/article/header/div[2]/div[1]/div[2]').text
+                self.writer.writerow([price_per_month])
 
     def save_data_info_file(self):
         ''' Take retrieved data and put into some datafile '''
@@ -84,6 +96,7 @@ list_of_cities = ['krakow']
 if __name__ == "__main__":
     Home = Home_seeker()
     for city in list_of_cities:
-        Home.number_of_pages()
-        Home.list_of_links(city)
-        Home.get_links_from_page()
+        # Home.number_of_pages()
+        # Home.list_of_links(city)
+        # Home.get_links_from_page()
+        Home.get_data_from_link()

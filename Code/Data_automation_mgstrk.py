@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import testa2
 import csv
+import re
 
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 CHROMEDRIVER_PATH = 'C:/Users/Adrian.Raszka/OneDrive - SOFYNE ACTIVE TECHNOLOGY/Bureau/gitvsc/chromedriver.exe'
@@ -84,11 +85,20 @@ class Home_seeker:
             for link in self.test_set:
                 self.driver.get(link)
                 price_per_month = self.driver.find_element_by_xpath('//*[@id="root"]/article/header/div[2]/div[1]/div[2]').text
-                self.writer.writerow([price_per_month])
+                self.writer.writerow([''.join([d for d in price_per_month if d.isdigit()])]) #przesunac na koniec
 
-    def save_data_info_file(self):
-        ''' Take retrieved data and put into some datafile '''
-        pass
+
+
+    def detailed_data_from_offer(self):
+        
+        offer_details_list = []
+        self.driver.get('https://www.otodom.pl/oferta/mieszkanie-2-pokojowe-50m2-gorka-narodowa-ID3jNMU.html#a9774d3f7a')
+        self.offer_details = self.driver.page_source
+        self.soup = BeautifulSoup(self.offer_details, 'lxml')
+        self.details_div = self.soup.find('div', attrs={"class": "css-1ci0qpi"})
+        for li in self.details_div.find_all('li'):
+            offer_details_list.append(li.text)
+        print(offer_details_list)
 
 
 list_of_cities = ['krakow']
@@ -99,4 +109,5 @@ if __name__ == "__main__":
         # Home.number_of_pages()
         # Home.list_of_links(city)
         # Home.get_links_from_page()
-        Home.get_data_from_link()
+        # Home.get_data_from_link()
+        Home.detailed_data_from_offer()

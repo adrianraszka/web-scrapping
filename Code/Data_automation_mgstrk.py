@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import testa2
 import csv
 import re
+import pandas as pd
 
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 CHROMEDRIVER_PATH = 'C:/Users/Adrian.Raszka/OneDrive - SOFYNE ACTIVE TECHNOLOGY/Bureau/gitvsc/chromedriver.exe'
@@ -18,7 +19,6 @@ class Home_seeker:
         """
         Taking chrome options.
         Going on the main page.
-        Will go with headless in future.
         """
 
         chrome_options = Options()
@@ -72,33 +72,40 @@ class Home_seeker:
         return set(singlepage_list_of_offers)
         # returning set to avoid duplicated offers 
 
-    def get_data_from_link(self):
+    def detailed_data_from_offer(self):
         ''' Take a link of offer and retrieve data from that offer '''
         
         # self.links_of_offers = Home.get_links_from_page()
-        # print(self.links_of_offers)
-        headers = ['price per month']
-        self.test_set = testa2.test_set
-        with open('text.csv', 'w', encoding='utf-8', newline='') as fp:
-            self.writer = csv.writer(fp)
-            self.writer.writerow(headers)
-            for link in self.test_set:
-                self.driver.get(link)
-                price_per_month = self.driver.find_element_by_xpath('//*[@id="root"]/article/header/div[2]/div[1]/div[2]').text
-                self.writer.writerow([''.join([d for d in price_per_month if d.isdigit()])]) #przesunac na koniec
-
-
-
-    def detailed_data_from_offer(self):
+        # headers = ['price_per_month', 'additional_rent', 'deposit', 'surface', 'rooms', 'city', 'district']
         
-        offer_details_list = []
-        self.driver.get('https://www.otodom.pl/oferta/mieszkanie-2-pokojowe-50m2-gorka-narodowa-ID3jNMU.html#a9774d3f7a')
-        self.offer_details = self.driver.page_source
-        self.soup = BeautifulSoup(self.offer_details, 'lxml')
-        self.details_div = self.soup.find('div', attrs={"class": "css-1ci0qpi"})
-        for li in self.details_div.find_all('li'):
-            offer_details_list.append(li.text)
-        print(offer_details_list)
+        check_headers = ['Czynsz - dodatkowo:', 'Kaucja:', 'Powierzchnia:', 'Liczba pokoi:']
+        price_per_month, additional_rent, deposit, surface, rooms = [], [], [], [], []
+        headers_table = [price_per_month, additional_rent, deposit, surface, rooms]
+
+        pattern_1 = re.compile(r'(?<=<li>)(.*)(?= <strong>)')
+        pattern_2 = re.compile(r'(?<=<strong>)(.*)(?=</strong>)')
+
+        self.test_set = testa2.test_set
+        for link in self.test_set:
+            #getting price per month of offer
+            self.driver.get(link)
+            price_per_month = self.driver.find_element_by_xpath('//*[@id="root"]/article/header/div[2]/div[1]/div[2]').text
+            headers_table[0].append([''.join([d for d in price_per_month if d.isdigit()])])
+            #getting other details of offer
+            self.soup = BeautifulSoup(self.offer_details, 'lxml')
+            self.details_div = self.soup.find('section', attrs={"class": "section-overview"})
+            for li in self.details_div.find_all('li'):
+                split_li = str(li.extract()) 
+                match_1 = pattern_1.search(split_li).group(1)
+                if match_1 in check_headers:
+                    header_index = check_headers.index(match_1)
+                    match_2 = pattern_2.search(split_li).group(1)
+                    headers_table[header_index].append(match_2) #
+        
+
+
+        pd.DataFrame({'price_per_month':price_per_month[0], 'additional_rent':headers_table[1],'deposit':headers_table[2], 
+                    'surface':headers_table[3], 'rooms':headers_table[4]}).to_csv('your.csv') #TODO: name of csv same as name of city with curret date
 
 
 list_of_cities = ['krakow']

@@ -60,7 +60,7 @@ class Home_seeker:
             list_of_page_links.append(
                 'https://www.otodom.pl/sprzedaz/mieszkanie/{}/?page={}'.format(city, i))
         # print(list_of_page_links)
-        return list_of_page_links[:35]
+        return list_of_page_links
 
     def get_links_from_page(self):
         ''' Take a link and retrieve all links of offers '''
@@ -209,7 +209,7 @@ list_of_cities = ['krakow']
 if __name__ == "__main__":
     Home = Home_seeker()
     for city in list_of_cities:
-        # Home.number_of_pages(city)
-        # Home.list_of_links(city)
-        Home.get_links_from_page()
+        Home.number_of_pages(city)
+        Home.list_of_links(city)
+        # Home.get_links_from_page()
         Home.detailed_data_from_offer()

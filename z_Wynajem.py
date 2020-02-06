@@ -10,7 +10,6 @@ import re
 import pandas as pd
 import names_of_districts
 
-
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 CHROMEDRIVER_PATH = 'C:/Users/adeq/Desktop/mgstrk/gitvsc2/chromedriver.exe'
 WINDOW_SIZE = "1200,1200"
@@ -31,6 +30,7 @@ class Home_seeker:
         chrome_options.binary_location = CHROME_PATH
         self.driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
                                        options=chrome_options)
+
 
     def number_of_pages(self, city):
         """ Given city name, returns number of pages with unique offers. """
@@ -169,5 +169,5 @@ if __name__ == "__main__":
     for city in list_of_cities:
         Home.number_of_pages(city)
         Home.list_of_links(city)
-        Home.get_links_from_page()
+        # Home.get_links_from_page()
         Home.detailed_data_from_offer()

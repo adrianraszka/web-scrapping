@@ -12,9 +12,12 @@ import csv
 import re
 import pandas as pd
 import names_of_districts
+import random
+
+start = time.perf_counter()
 
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-CHROMEDRIVER_PATH = 'C:/Users/adeq/Desktop/mgstrk/gitvsc2/chromedriver.exe'
+CHROMEDRIVER_PATH = 'C:/Users/adeq/Desktop/mgstrk/gitvsc2/chromedriver80.exe'
 WINDOW_SIZE = "1200,1200"
 
 
@@ -198,10 +201,11 @@ class Home_seeker:
                 pass
 
         today = str(date.today())
+        randint_ = str(random.randint(1, 10000000))
         pd.DataFrame({'price_whole': headers_table[0], 'price_per_m2': headers_table[1], 'market': headers_table[2],
                       'surface': headers_table[3], 'rooms': headers_table[4], 'build_year': headers_table[5], 'finishing_condition': headers_table[6],
                       'heating': headers_table[7], 'windows': headers_table[8], 'city': headers_table[9],
-                      'district': headers_table[10]}).to_csv('{}_{}_Sprzedaz.csv'.format(today, city[0]))
+                      'district': headers_table[10]}).to_csv('{}_{}_Sprzedaz_{}.csv'.format(today, city[0], randint_))
 
 
 list_of_cities = ['krakow']
@@ -209,7 +213,11 @@ list_of_cities = ['krakow']
 if __name__ == "__main__":
     Home = Home_seeker()
     for city in list_of_cities:
-        Home.number_of_pages(city)
-        Home.list_of_links(city)
-        # Home.get_links_from_page()
-        Home.detailed_data_from_offer()
+        while True:
+            # Home.number_of_pages(city)
+            # Home.list_of_links(city)
+            # Home.get_links_from_page()
+            Home.detailed_data_from_offer()
+
+finish = time.perf_counter()
+print(f'Finished in {round(finish-start, 2)} second(s)')

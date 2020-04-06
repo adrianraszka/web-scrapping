@@ -9,9 +9,12 @@ import csv
 import re
 import pandas as pd
 import names_of_districts
+import random
+
+start = time.perf_counter()
 
 CHROME_PATH = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
-CHROMEDRIVER_PATH = 'C:/Users/adeq/Desktop/mgstrk/gitvsc2/chromedriver.exe'
+CHROMEDRIVER_PATH = 'C:/Users/adeq/Desktop/mgstrk/gitvsc2/chromedriver80.exe'
 WINDOW_SIZE = "1200,1200"
 
 
@@ -86,6 +89,7 @@ class Home_seeker:
 
         counter = 0
         self.links_of_offers = Home.get_links_from_page()
+        print(self.list_of_links)
         check_headers = ['Cena na miesiąc', 'Czynsz - dodatkowo:',
                          'Kaucja:', 'Powierzchnia:', 'Liczba pokoi:', 'Miasto', 'Dzielnica']
         price_per_month, additional_rent, deposit, surface, rooms, city, district = [
@@ -140,7 +144,6 @@ class Home_seeker:
                 if 'Kaucja:' not in list_of_details:
                     headers_table[2].append('None')
 
-                location_details = []
                 location = self.driver.find_element_by_xpath(
                     '//*[@id="root"]/article/header/div[1]/div/div/div/a').text
                 location = location.split(',')
@@ -158,16 +161,23 @@ class Home_seeker:
                 pass
 
         today = str(date.today())
+        randint_ = str(random.randint(1, 10000000))
         pd.DataFrame({'price_per_month': headers_table[0], 'additional_rent': headers_table[1], 'deposit': headers_table[2],
-                      'surface': headers_table[3], 'rooms': headers_table[4], 'city': headers_table[5], 'district': headers_table[6]}).to_csv('{}_{}_Wynajem.csv'.format(today, city[0]))
+                      'surface': headers_table[3], 'rooms': headers_table[4], 'city': headers_table[5], 'district': headers_table[6]}).to_csv('{}_{}_Wynajem_{}.csv'.format(today, city[0], randint_))
 
 
 list_of_cities = ['krakow']
 
 if __name__ == "__main__":
+
     Home = Home_seeker()
-    for city in list_of_cities:
-        Home.number_of_pages(city)
-        Home.list_of_links(city)
-        # Home.get_links_from_page()
-        Home.detailed_data_from_offer()
+    while True:
+        for city in list_of_cities:
+            # Home.number_of_pages(city)
+            # Home.list_of_links(city)
+            # Home.get_links_from_page()
+            Home.detailed_data_from_offer()
+
+
+finish = time.perf_counter()
+print(f'Finished in {round(finish-start, 2)} second(s)')
